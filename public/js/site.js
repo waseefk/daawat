@@ -33,6 +33,40 @@
         if (e.key === "Escape") setMenu(false);
     });
 
+    // Scroll to sections without adding #section to the address bar.
+    // Smooth scrolling and the header offset come from the CSS on <html>.
+    function clearHash() {
+        if (location.hash && window.history.replaceState) {
+            history.replaceState(null, "", location.pathname + location.search);
+        }
+    }
+    document.addEventListener("click", function (e) {
+        var link = e.target.closest('a[href^="#"]');
+        if (!link || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var id = link.getAttribute("href").slice(1);
+        // "#top" has no element; browsers treat it as the top of the page
+        var target = id === "top" ? document.documentElement : id && document.getElementById(id);
+        if (!target) return;
+        e.preventDefault();
+        if (id === "top") {
+            window.scrollTo(0, 0);
+            // Send keyboard focus back to the start of the page too
+            if (document.activeElement) document.activeElement.blur();
+        } else {
+            target.scrollIntoView();
+            // Move keyboard focus with the scroll, as a normal link jump would
+            if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+            target.focus({ preventScroll: true });
+        }
+        clearHash();
+    });
+    // An old link with #section still jumps there, then the hash is tidied away
+    window.addEventListener("load", function () {
+        var target = location.hash && document.getElementById(location.hash.slice(1));
+        if (target) target.scrollIntoView({ behavior: "instant" });
+        clearHash();
+    });
+
     // Menu tabs
     var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
     function selectTab(tab, focus) {
