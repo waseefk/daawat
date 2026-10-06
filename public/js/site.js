@@ -54,6 +54,10 @@
         });
     });
 
-    // Keep the copyright year current
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // Keep the copyright year and years in business current
+    var thisYear = new Date().getFullYear();
+    document.getElementById("year").textContent = thisYear;
+    Array.prototype.forEach.call(document.querySelectorAll(".years-since"), function (el) {
+        el.textContent = thisYear - Number(el.getAttribute("data-since"));
+    });
 })();
